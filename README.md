@@ -1,1 +1,1 @@
-BytePlus 请求签名示例代码
+Sample code for BytePlus request signatures

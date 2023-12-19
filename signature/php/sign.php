@@ -17,7 +17,7 @@
 
 require 'vendor/autoload.php';
 
-// 需要自行安装 composer（https://getcomposer.org/doc/00-intro.md），并安装GuzzleHttp依赖， composer require guzzlehttp/guzzle:^7.0
+// Install the composer (https://getcomposer.org/doc/00-intro.md) and the GuzzleHttp dependency: composer require guzzlehttp/guzzle:^7.0.
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
@@ -47,13 +47,14 @@ try {
 /**
  * @throws GuzzleException
  */
-// 第一步：创建一个  API 请求函数。签名计算的过程包含在该函数中。
+// Step 1: Create an API request function that includes a signature calculation method.
 function request($method, $query, $header, $ak, $sk, $action, $body)
 {
 
-    // 第二步：创建身份证明。其中的 Service 和 Region 字段是固定的。ak 和 sk 分别代表
-    // AccessKeyID 和 SecretAccessKey。同时需要初始化签名结构体。一些签名计算时需要的属性也在这里处理。
-    // 初始化身份证明结构体
+    // Step 2: Create an identity credential. 
+    // The values of the Service and Region fields are fixed and the values of the ak and sk fields indicate an access key ID and a secret access key, respectively. 
+    // Signature struct initialization is also required. Some attributes required for signature calculation also need to be processed here. 
+    // Initialize the identity credential struct.
     global $Service, $Region, $Host, $Version, $ContentType;
     $credential = [
         'accessKeyId' => $ak,
@@ -62,14 +63,14 @@ function request($method, $query, $header, $ak, $sk, $action, $body)
         'region' => $Region,
     ];
 
-    // 初始化签名结构体
+    // Initialize the signature struct.
     $query = array_merge($query, [
         'Action' => $action,
         'Version' => $Version
     ]);
     ksort($query);
     $requestParam = [
-        // body是http请求需要的原生body
+        // The body is the native body required by HTTP requests.
         'body' => $body,
         'host' => $Host,
         'path' => '/',
@@ -79,8 +80,8 @@ function request($method, $query, $header, $ak, $sk, $action, $body)
         'query' => $query
     ];
 
-    // 第三步：接下来开始计算签名。在计算签名前，先准备好用于接收签算结果的 signResult 变量，并设置一些参数。
-    // 初始化签名结果的结构体
+    // Step 3: Prepare a signResult variable for receiving the signature calculation result and set the required parameters. 
+    // Initialize the signature result struct.
     $xDate = $requestParam['date'];
     $shortXDate = substr($xDate, 0, 8);
     $xContentSha256 = hash('sha256', $requestParam['body']);
@@ -90,7 +91,7 @@ function request($method, $query, $header, $ak, $sk, $action, $body)
         'X-Date' => $xDate,
         'Content-Type' => $requestParam['contentType']
     ];
-    // 第四步：计算 Signature 签名。
+    // Step 4: Calculate a signature.
     $signedHeaderStr = join(';', ['content-type', 'host', 'x-content-sha256', 'x-date']);
     $canonicalRequestStr = join("\n", [
         $requestParam['method'],
@@ -111,7 +112,7 @@ function request($method, $query, $header, $ak, $sk, $action, $body)
     $signature = hash_hmac("sha256", $stringToSign, $kSigning);
     $signResult['Authorization'] = sprintf("HMAC-SHA256 Credential=%s, SignedHeaders=%s, Signature=%s", $credential['accessKeyId'] . '/' . $credentialScope, $signedHeaderStr, $signature);
     $header = array_merge($header, $signResult);
-    // 第五步：将 Signature 签名写入 HTTP Header 中，并发送 HTTP 请求。
+    // Step 5: Write the signature into the HTTP header and send the HTTP request.
     $client = new Client([
         'base_uri' => 'https://' . $requestParam['host'],
         'timeout' => 120.0,

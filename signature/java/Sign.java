@@ -74,9 +74,9 @@ public class Sign {
     public static void main(String[] args) throws Exception {
         String AccessKeyID = "AK****";
         String SecretAccessKey = "****";
-        // 请求地址
+        // Request URL
         String endpoint = "open.byteplusapi.com";
-        String path = "/"; // 路径，不包含 Query// 请求接口信息
+        String path = "/"; // Path, excluding the query string
         String service = "iam";
         String region = "ap-singapore-1";
         String schema = "https";

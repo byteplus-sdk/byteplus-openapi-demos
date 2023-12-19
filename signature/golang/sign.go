@@ -30,15 +30,15 @@ import (
 )
 
 const (
-	// 请求凭证，从访问控制申请
+	// Request credential, obtained from Identity and Access Management
 	AccessKeyID     = "AK"
 	SecretAccessKey = "****"
 
-	// 请求地址
+	// Request URL
 	Addr = "https://open.byteplusapi.com"
-	Path = "/" // 路径，不包含 Query
+	Path = "/" // Path, excluding the query string
 
-	// 请求接口信息
+	// Information about the API operation
 	Service = "iam"
 	Region  = "ap-singapore-1"
 	Action  = "ListUsers"
@@ -70,7 +70,7 @@ func hashSHA256(data []byte) []byte {
 }
 
 func doRequest(method string, queries url.Values, body []byte) error {
-	// 1. 构建请求
+	// 1. Construct a request
 	queries.Set("Action", Action)
 	queries.Set("Version", Version)
 	requestAddr := fmt.Sprintf("%s%s?%s", Addr, Path, queries.Encode())
@@ -81,7 +81,7 @@ func doRequest(method string, queries url.Values, body []byte) error {
 		return fmt.Errorf("bad request: %w", err)
 	}
 
-	// 2. 构建签名材料
+	// 2. Construct signature materials
 	now := time.Now()
 	date := now.UTC().Format("20060102T150405Z")
 	authDate := date[:8]
@@ -126,7 +126,7 @@ func doRequest(method string, queries url.Values, body []byte) error {
 	}, "\n")
 	log.Printf("sign string:\n%s\n", signString)
 
-	// 3. 构建认证请求头
+	// 3. Construct an authorization request header
 	signedKey := getSignedKey(SecretAccessKey, authDate, Region, Service)
 	signature := hex.EncodeToString(hmacSHA256(signedKey, signString))
 	log.Printf("signature: %s\n", signature)
@@ -138,7 +138,7 @@ func doRequest(method string, queries url.Values, body []byte) error {
 	request.Header.Set("Authorization", authorization)
 	log.Printf("authorization: %s\n", authorization)
 
-	// 4. 打印请求，发起请求
+	// 4. Print and initiate a request
 	requestRaw, err := httputil.DumpRequest(request, true)
 	if err != nil {
 		return fmt.Errorf("dump request err: %w", err)
@@ -151,7 +151,7 @@ func doRequest(method string, queries url.Values, body []byte) error {
 		return fmt.Errorf("do request err: %w", err)
 	}
 
-	// 5. 打印响应
+	// 5. Print a response
 	responseRaw, err := httputil.DumpResponse(response, true)
 	if err != nil {
 		return fmt.Errorf("dump response err: %w", err)
@@ -169,7 +169,7 @@ func doRequest(method string, queries url.Values, body []byte) error {
 }
 
 func main() {
-	// GET 请求例子
+	// GET request example
 	query1 := make(url.Values)
 	query1.Set("Limit", "100")
 	query1.Set("Offset", "0")
@@ -178,7 +178,7 @@ func main() {
 		log.Printf("do Request err: %+v", err)
 	}
 
-	// Post 请求例子
+	// POST request example
 	// query2 := make(url.Values)
 	// query2.Set("args1", "value1")
 	// query2.Set("args2", "value2")
