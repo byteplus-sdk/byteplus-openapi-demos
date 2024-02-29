@@ -1,4 +1,4 @@
-# Byteplus Request Signature Simple Code
+# BytePlus Request Signature Simple Code
 
 This repository provides simple and reusable code snippets for generating request signatures for BytePlus requests in Java, Go, Python, PHP, and C#.
 
